@@ -3,16 +3,6 @@ import Welcome from "../views/Welcome.vue";
 import Chatroom from "../views/Chatroom.vue";
 import { projectAuth } from "../firebase/config";
 
-const requireAuth = (to, from, next) => {
-  let user = projectAuth.currentUser;
-  console.log("current user in auth guard: ", user);
-  if (!user) {
-    next({ name: "Welcome" });
-  } else {
-    next();
-  }
-};
-
 const routes = [
   {
     path: "/",
@@ -22,14 +12,28 @@ const routes = [
   {
     path: "/chatroom",
     name: "Chatroom",
-    component: Chatroom,
-    beforeEnter: requireAuth
+    component: Chatroom
+  },
+  {
+    path: "/:catchAll(.*)",
+    redirect: to => ({ name: "Welcome" })
   }
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
+});
+
+router.beforeResolve((to, from, next) => {
+  let user = projectAuth.currentUser;
+  if (!user && to.path === "/chatroom") {
+    next({ name: "Welcome" });
+  } else if (user && to.path === "/") {
+    next({ name: "Chatroom" });
+  } else {
+    next();
+  }
 });
 
 export default router;
