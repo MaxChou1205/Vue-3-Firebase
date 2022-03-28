@@ -24,3 +24,8 @@
 ### deploy
 
 `firebase deploy`
+
+### locking API to a domain
+[Google APIs](https://console.cloud.google.com/apis/dashboard)
+![](images/cert1.png)
+![](images/cert2.png)
