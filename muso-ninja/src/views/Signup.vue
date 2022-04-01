@@ -25,7 +25,7 @@ const password = ref("");
 const handleSubmit = async () => {
   const res = await signup(email.value, password.value, displayName.value);
   if (!error.value) {
-    router.push({ name: "Home" });
+    router.push({ name: "UserPlaylists" });
   }
 };
 </script>
