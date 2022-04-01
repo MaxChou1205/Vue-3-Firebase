@@ -14,7 +14,23 @@
 
     <!-- song list -->
     <div class="song-list">
-      <p>song list here</p>
+      <div v-if="!playlist.songs.length">
+        No songs have been added to this playlist yet.
+      </div>
+      <div
+        v-for="(song, index) in playlist.songs"
+        :key="song.id"
+        class="single-song"
+      >
+        <div class="details">
+          <h3>{{ song.title }}</h3>
+          <p>{{ song.artist }}</p>
+        </div>
+        <button v-if="ownership" @click="handleDeleteSong(song.id)">
+          delete
+        </button>
+      </div>
+      <AddSong v-if="ownership" :playlist="playlist" />
     </div>
   </div>
 </template>
@@ -26,6 +42,7 @@ import getUser from "@/composables/getUser";
 import getDocument from "@/composables/getDocument";
 import useDocument from "@/composables/useDocument";
 import useStorage from "@/composables/useStorage";
+import AddSong from "@/components/AddSong.vue";
 
 const props = defineProps({
   id: String
@@ -34,7 +51,7 @@ const props = defineProps({
 const router = useRouter();
 const { user } = getUser();
 const { error, document: playlist } = getDocument("playlists", props.id);
-const { deleteDoc } = useDocument("playlists", props.id);
+const { deleteDoc, updateDoc } = useDocument("playlists", props.id);
 const { deleteImage } = useStorage();
 
 const ownership = computed(() => {
@@ -47,6 +64,11 @@ const handleDelete = async () => {
   await deleteImage(playlist.value.filePath);
   await deleteDoc();
   router.push({ name: "Home" });
+};
+
+const handleDeleteSong = async id => {
+  let songs = playlist.value.songs.filter(s => s.id !== id);
+  await updateDoc({ songs });
 };
 </script>
 
@@ -88,5 +110,13 @@ const handleDelete = async () => {
 }
 .description {
   text-align: left;
+}
+.single-song {
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed var(--secondary);
+  margin-bottom: 20px;
 }
 </style>
